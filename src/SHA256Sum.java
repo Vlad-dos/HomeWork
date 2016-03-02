@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 public class SHA256Sum {
 
@@ -11,9 +12,14 @@ public class SHA256Sum {
         byte[] data;
         if (args.length == 0) {
             byte[] x = new byte[1];
-            data = new byte[System.in.available()];
-            for (int i = 0; System.in.read(x) != -1; i++) {
-                data[i] = x[0];
+            ArrayList<Byte> tmp = new ArrayList<>();
+            while (System.in.read(x) != -1) {
+                tmp.add(x[0]);
+            }
+            data = new byte[tmp.size()];
+            int j = 0;
+            for (Byte i : tmp) {
+                data[j] = i;
             }
             getHash(data, "-");
         } else {
