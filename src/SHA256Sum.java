@@ -16,11 +16,13 @@ public class SHA256Sum {
             while (System.in.read(x) != -1) {
                 tmp.add(x[0]);
             }
+
             data = new byte[tmp.size()];
             int j = 0;
             for (Byte i : tmp) {
-                data[j] = i;
+                data[j++] = i;
             }
+
             getHash(data, "-");
         } else {
             for (String fileName : args) {
