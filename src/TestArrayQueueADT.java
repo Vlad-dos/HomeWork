@@ -28,11 +28,11 @@ public class TestArrayQueueADT {
             }
             if (!queue.isEmpty()) {
                 if (type == 1) {
-                    if (ArrayQueueADT.element(myQueue) != queue.get(0)) {
+                    if (!ArrayQueueADT.element(myQueue).toString().equals(queue.get(0).toString())) {
                         System.out.println("FAIL1");
                     }
                 } else if (type == 2) {
-                    if (ArrayQueueADT.dequeue(myQueue) != queue.get(0)) {
+                    if (!ArrayQueueADT.dequeue(myQueue).toString().equals(queue.get(0).toString())) {
                         System.out.println("FAIL2");
                     }
                     queue.remove(0);

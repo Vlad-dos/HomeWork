@@ -27,11 +27,11 @@ public class TestArrayQueueModule {
             }
             if (!queue.isEmpty()) {
                 if (type == 1) {
-                    if (ArrayQueueModule.element() != queue.get(0)) {
+                    if (!ArrayQueueModule.element().toString().equals(queue.get(0).toString())) {
                         System.out.println("FAIL1");
                     }
                 } else if (type == 2) {
-                    if (ArrayQueueModule.dequeue() != queue.get(0)) {
+                    if (!ArrayQueueModule.dequeue().toString().equals(queue.get(0).toString())) {
                         System.out.println("FAIL2");
                     }
                     queue.remove(0);
