@@ -33,6 +33,10 @@ public class ArrayQueueModule {
         return (i + 1) % data.length;
     }
 
+    static private int prev(int i) {
+        return (i + data.length - 1) % data.length;
+    }
+
     // pre: a != null
     // post: size == size' + 1 &&
     //       tail == tail' + 1 &&
@@ -44,10 +48,27 @@ public class ArrayQueueModule {
         tail = next(tail);
     }
 
+    // pre: a != null
+    // post: size == size' + 1 &&
+    //       head == head' - 1 &&
+    //       data[head] == a
+    static public void push(Object a) {
+        ensureCapacity(size + 1);
+        size++;
+        head = prev(head);
+        data[head] = a;
+    }
+
     // pre: size > 0
     // post: result == data[head]
     static public Object element() {
         return data[head];
+    }
+
+    // pre: size > 0
+    // post: result == data[tail - 1]
+    static public Object peek() {
+        return data[prev(tail)];
     }
 
     // pre: size > 0
@@ -57,6 +78,14 @@ public class ArrayQueueModule {
         Object tmp = data[head];
         head = next(head);
         return tmp;
+    }
+
+    // pre: size > 0
+    // post: result == data[tail] && tail = tail' - 1
+    static public Object remove() {
+        size--;
+        tail = prev(tail);
+        return data[tail];
     }
 
     // post: result == size
