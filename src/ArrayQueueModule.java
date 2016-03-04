@@ -16,31 +16,28 @@ public class ArrayQueueModule {
         if (tail > head) {
             System.arraycopy(data, head, newData, 0, tail - head);
         } else {
-            int j = 0;
-            for (int i = head; i < data.length; i++) {
-                newData[j++] = data[i];
-            }
-            for (int i = 0; i < tail; i++) {
-                newData[j++] = data[i];
-            }
+            System.arraycopy(data, head, newData, 0, data.length - head);
+            System.arraycopy(data, 0, newData, data.length - head, tail);
         }
         data = newData;
         head = 0;
         tail = size;
     }
 
+    //post: result = next i
     static private int next(int i) {
         return (i + 1) % data.length;
     }
 
+    //post: result = prev i
     static private int prev(int i) {
         return (i + data.length - 1) % data.length;
     }
 
     // pre: a != null
     // post: size == size' + 1 &&
-    //       tail == tail' + 1 &&
-    //       data[tail'] == a
+    //       Any 0 <= i < size - 1 data[i] == data'[i]
+    //       data[size - 1] == a
     static public void enqueue(Object a) {
         ensureCapacity(size + 1);
         size++;
@@ -50,8 +47,8 @@ public class ArrayQueueModule {
 
     // pre: a != null
     // post: size == size' + 1 &&
-    //       head == head' - 1 &&
-    //       data[head] == a
+    //       Any 0 < i < size data[i - 1] == data'[i]
+    //       data[0] == a
     static public void push(Object a) {
         ensureCapacity(size + 1);
         size++;
@@ -60,45 +57,57 @@ public class ArrayQueueModule {
     }
 
     // pre: size > 0
-    // post: result == data[head]
+    // post: result == data[0]
+    //       Any 0 <= i < size data[i] == data'[i]
     static public Object element() {
         return data[head];
     }
 
     // pre: size > 0
-    // post: result == data[tail - 1]
+    // post: result == data[size - 1]
+    //       Any 0 <= i < size data[i] == data'[i]
     static public Object peek() {
         return data[prev(tail)];
     }
 
     // pre: size > 0
-    // post: result == data[head] && head = head' + 1
+    // post: result == data[0]
+    //       Any 0 <= i < size data[i + 1] == data'[i]
     static public Object dequeue() {
         size--;
         Object tmp = data[head];
+        data[head] = null;
         head = next(head);
         return tmp;
     }
 
     // pre: size > 0
-    // post: result == data[tail] && tail = tail' - 1
+    // post: result == data'[size - 1]
+    //       Any 0 <= i < size - 1 data[i] == data'[i]
     static public Object remove() {
         size--;
         tail = prev(tail);
-        return data[tail];
+        Object tmp = data[tail];
+        data[tail] = null;
+        return tmp;
     }
 
     // post: result == size
+    //       data == data';
+    //       size == size'
     static public int size() {
         return size;
     }
 
     // post: result == size > 0
+    //       data == data'
+    //       size == size'
     static public boolean isEmpty() {
         return size == 0;
     }
 
-    // post: head = 0 && tail == 0 && size == 0
+    // post: size == 0
+    //       data == data';
     static public void clear() {
         tail = 0;
         head = 0;
