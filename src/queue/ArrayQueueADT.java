@@ -1,3 +1,5 @@
+package queue;
+
 public class ArrayQueueADT {
     static final private int MIN_SIZE = 10;
     private int head = 0;

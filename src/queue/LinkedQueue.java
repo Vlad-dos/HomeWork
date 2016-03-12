@@ -1,3 +1,5 @@
+package queue;
+
 public class LinkedQueue extends AbstractQueue {
     private class Node {
         Object data;
