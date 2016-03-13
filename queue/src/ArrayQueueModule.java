@@ -1,4 +1,3 @@
-package queue;// inv : size >= 0 &&
 //       data[head..tail] != null
 
 public class ArrayQueueModule {

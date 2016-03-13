@@ -1,5 +1,3 @@
-package expression;
-
 public class Const implements Evaluable {
     private double value;
 

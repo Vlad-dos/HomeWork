@@ -1,5 +1,3 @@
-package expression;
-
 public class Divide extends Operation {
     public Divide(Evaluable first, Evaluable second) {
         super(first, second);

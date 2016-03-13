@@ -1,5 +1,3 @@
-package queue;
-
 public class ArrayQueueADT {
     static final private int MIN_SIZE = 10;
     private int head = 0;
@@ -7,7 +5,7 @@ public class ArrayQueueADT {
     private int size = 0;
     private Object[] data = new Object[MIN_SIZE];
 
-    //pre: queue != null
+    //pre: myqueue != null
     //post data.length > capacity
     static private void ensureCapacity(ArrayQueueADT queue, int capacity) {
         if (capacity < queue.data.length) {
@@ -25,20 +23,20 @@ public class ArrayQueueADT {
         queue.tail = queue.size;
     }
 
-    //pre: queue != null
+    //pre: myqueue != null
     //post: result = next i
     static private int next(ArrayQueueADT queue, int i) {
         return (i + 1) % queue.data.length;
     }
 
-    //pre: queue != null
+    //pre: myqueue != null
     //post: result = prev i
     static private int prev(ArrayQueueADT queue, int i) {
         return (i + queue.data.length - 1) % queue.data.length;
     }
 
     // pre: a != null
-    //      queue != null
+    //      myqueue != null
     // post: size == size' + 1 &&
     //       Any 0 <= i < size - 1 data[i] == data'[i]
     //       data[size - 1] == a
@@ -50,7 +48,7 @@ public class ArrayQueueADT {
     }
 
     // pre: a != null
-    //      queue != null
+    //      myqueue != null
     // post: size == size' + 1 &&
     //       Any 0 < i < size data[i - 1] == data'[i]
     //       data[0] == a
@@ -62,7 +60,7 @@ public class ArrayQueueADT {
     }
 
     // pre: size > 0
-    //      queue != null
+    //      myqueue != null
     // post: result == data[0]
     //       Any 0 <= i < size data[i] == data'[i]
     static public Object element(ArrayQueueADT queue) {
@@ -70,7 +68,7 @@ public class ArrayQueueADT {
     }
 
     // pre: size > 0
-    //      queue != null
+    //      myqueue != null
     // post: result == data[size - 1]
     //       Any 0 <= i < size data[i] == data'[i]
     static public Object peek(ArrayQueueADT queue) {
@@ -78,7 +76,7 @@ public class ArrayQueueADT {
     }
 
     // pre: size > 0
-    //      queue != null
+    //      myqueue != null
     // post: result == data[0]
     //       Any 0 <= i < size data[i + 1] == data'[i]
     static public Object dequeue(ArrayQueueADT queue) {
@@ -90,7 +88,7 @@ public class ArrayQueueADT {
     }
 
     // pre: size > 0
-    //      queue != null
+    //      myqueue != null
     // post: result == data[size - 1]
     //       Any 0 <= i < size - 1 data[i] == data'[i]
     static public Object remove(ArrayQueueADT queue) {
@@ -101,7 +99,7 @@ public class ArrayQueueADT {
         return tmp;
     }
 
-    //pre: queue != null
+    //pre: myqueue != null
     // post: result == size
     //       data == data';
     //       size = size'
@@ -109,7 +107,7 @@ public class ArrayQueueADT {
         return queue.size;
     }
 
-    //pre: queue != null
+    //pre: myqueue != null
     // post: result == size > 0
     //       data == data';
     //       size = size'
@@ -117,7 +115,7 @@ public class ArrayQueueADT {
         return queue.size == 0;
     }
 
-    //pre: queue != null
+    //pre: myqueue != null
     // post: size == 0
     //       data == data';
     static public void clear(ArrayQueueADT queue) {

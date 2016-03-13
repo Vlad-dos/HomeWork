@@ -1,5 +1,3 @@
-package expression;
-
 public class Variable implements Evaluable {
     private String name;
 

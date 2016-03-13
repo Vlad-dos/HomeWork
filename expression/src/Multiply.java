@@ -1,5 +1,3 @@
-package expression;
-
 public class Multiply extends Operation {
     public Multiply(Evaluable first, Evaluable second) {
         super(first, second);

@@ -1,12 +1,12 @@
-package search;
+public class BinarySearch {
+    static final boolean USE_ITER = false;
 
-public class BinarySearchSpan {
     // pre: (a[i] >= a[i + 1])
-    // post: (a[R] <= x || R == a.length) && a[R - 1] > x
+    // post: a[R] <= x ∧ a[R - 1] > x
     public static int binSearchIter(int x, int[] a) {
         int l = 0;
         int r = a.length;
-        // inv: (0 <= l < r <= a.length) && (a[l] > x || l == 0) && (a[r] <= x || r == a.length)
+        // inv: (0 <= l < r <= a.length) ∧ (a[l] > x) ∧ (a[r] <= x)
         while (r - l > 1) {
             int m = (l + r) / 2;
             if (a[m] > x) {
@@ -15,17 +15,17 @@ public class BinarySearchSpan {
                 r = m;
             }
         }
-        return r;
+        return r - 1;
     }
 
-    // pre: (a[i] >= a[i + 1]) && (0 <= l < r <= a.length) && (a[l] >= x || l == 0) && (a[r] < x || r == a.length)
-    // post: (a[L] >= x || L == 0) && a[L + 1] < x
+    // pre: (a[i] >= a[i + 1]) ∧ (0 <= l < r <= a.length) ∧ (a[l] >= x) ∧ (a[r] < x)
+    // post: a[R] <= x ∧ a[R - 1] > x
     public static int binSearchReq(int x, int a[], int l, int r) {
         if (r - l <= 1) {
-            return l;
+            return r - 1;
         }
         int m = (l + r) / 2;
-        if (a[m] >= x) {
+        if (a[m] > x) {
             l = m;
         } else {
             r = m;
@@ -41,8 +41,10 @@ public class BinarySearchSpan {
             a[i] = Integer.parseInt(args[i]);
         }
 
-        int pos = binSearchIter(x, a) - 1;
-        System.out.print(pos + " ");
-        System.out.print(binSearchReq(x, a, 0, a.length) - pos);
+        if (USE_ITER) {
+            System.out.println(binSearchIter(x, a));
+        } else {
+            System.out.println(binSearchReq(x, a, 0, a.length + 1));
+        }
     }
 }

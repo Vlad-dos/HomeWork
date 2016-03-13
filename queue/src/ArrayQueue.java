@@ -1,5 +1,3 @@
-package queue;
-
 public class ArrayQueue extends AbstractQueue {
     final private int MIN_SIZE = 10;
     private int head = 0;
@@ -47,6 +45,10 @@ public class ArrayQueue extends AbstractQueue {
         tail = 0;
         head = 0;
         data = new Object[MIN_SIZE];
+    }
+
+    protected Queue makeQueue() {
+        return new ArrayQueue();
     }
 }
 

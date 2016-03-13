@@ -1,5 +1,3 @@
-package queue;
-
 public class LinkedQueue extends AbstractQueue {
     private class Node {
         Object data;
@@ -39,5 +37,9 @@ public class LinkedQueue extends AbstractQueue {
     protected void doClear() {
         head = new Node();
         tail = head;
+    }
+
+    protected Queue makeQueue() {
+        return new LinkedQueue();
     }
 }

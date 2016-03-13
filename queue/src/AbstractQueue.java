@@ -1,5 +1,3 @@
-package queue;
-
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -13,6 +11,8 @@ public abstract class AbstractQueue implements Queue {
     protected abstract Object doElement();
 
     protected abstract void doClear();
+
+    protected abstract Queue makeQueue();
 
     public void enqueue(Object a) {
         doEnqueue(a);
@@ -42,7 +42,7 @@ public abstract class AbstractQueue implements Queue {
     }
 
     public Queue filter(Predicate<Object> predicate) {
-        Queue newQueue = new LinkedQueue();
+        Queue newQueue = makeQueue();
         int sz = size;
         for (int i = 0; i < sz; i++) {
             if (predicate.test(element())) {
@@ -54,7 +54,7 @@ public abstract class AbstractQueue implements Queue {
     }
 
     public Queue map(Function<Object, Object> function) {
-        Queue newQueue = new LinkedQueue();
+        Queue newQueue = makeQueue();
         int sz = size;
         for (int i = 0; i < sz; i++) {
             newQueue.enqueue(function.apply(element()));

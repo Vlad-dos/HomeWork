@@ -1,5 +1,3 @@
-package expression;
-
 public abstract class Operation implements Evaluable {
     protected Evaluable first, second;
 
