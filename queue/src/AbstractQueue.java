@@ -41,25 +41,26 @@ public abstract class AbstractQueue implements Queue {
         doClear();
     }
 
-    public Queue filter(Predicate<Object> predicate) {
+    public Queue map(Function<Object, Object> function) {
         Queue newQueue = makeQueue();
         int sz = size;
         for (int i = 0; i < sz; i++) {
-            if (predicate.test(element())) {
-                newQueue.enqueue(element());
+            Object newElement = function.apply(element());
+            if (newElement != null) {
+                newQueue.enqueue(newElement);
             }
             enqueue(dequeue());
         }
         return newQueue;
     }
 
-    public Queue map(Function<Object, Object> function) {
-        Queue newQueue = makeQueue();
-        int sz = size;
-        for (int i = 0; i < sz; i++) {
-            newQueue.enqueue(function.apply(element()));
-            enqueue(dequeue());
-        }
-        return newQueue;
+    public Queue filter(Predicate<Object> predicate) {
+        return map((Object element) -> {
+            if (predicate.test(element)) {
+                return element;
+            } else {
+                return null;
+            }
+        });
     }
 }
