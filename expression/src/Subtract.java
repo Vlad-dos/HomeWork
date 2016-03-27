@@ -1,6 +1,10 @@
 public class Subtract extends Operation {
-    public Subtract(Evaluable first, Evaluable second) {
+    public Subtract(AllExpression first, AllExpression second) {
         super(first, second);
+    }
+
+    protected int calculate(int a, int b) {
+        return a - b;
     }
 
     protected double calculate(double a, double b) {

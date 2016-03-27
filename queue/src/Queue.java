@@ -13,6 +13,7 @@ public interface Queue {
     //       data == data';
     //       any 0 <= i < result.size predicate.test(result[i]) == true
     //       any i not in result : predicate.test(data[i]) == false
+    //       for any i in result exist unique j and data[j] == result[i] and if j1 < j2 then i1 < i2
     Queue filter(Predicate<Object> predicate);
 
     // pre: function != null

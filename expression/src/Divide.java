@@ -1,6 +1,10 @@
 public class Divide extends Operation {
-    public Divide(Evaluable first, Evaluable second) {
+    public Divide(AllExpression first, AllExpression second) {
         super(first, second);
+    }
+
+    protected int calculate(int a, int b) {
+        return a / b;
     }
 
     protected double calculate(double a, double b) {

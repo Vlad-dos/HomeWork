@@ -1,11 +1,25 @@
-public class Const implements Evaluable {
-    private double value;
+public class Const implements AllExpression {
+    private double doubleValue;
+    private int intValue;
+
+    Const(int value) {
+        this.intValue = value;
+        this.doubleValue = value;
+    }
 
     Const(double value) {
-        this.value = value;
+        this.doubleValue = value;
+    }
+
+    public int evaluate(int x, int y, int z) {
+        return intValue;
     }
 
     public double evaluate(double x) {
-        return value;
+        return doubleValue;
+    }
+
+    public int evaluate(int x) {
+        return intValue;
     }
 }

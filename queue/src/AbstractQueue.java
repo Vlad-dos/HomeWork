@@ -1,3 +1,4 @@
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -41,25 +42,24 @@ public abstract class AbstractQueue implements Queue {
         doClear();
     }
 
-    public Queue map(Function<Object, Object> function) {
+    public Queue process(BiConsumer<Queue, Object> consumer) {
         Queue newQueue = makeQueue();
         int sz = size;
         for (int i = 0; i < sz; i++) {
-            Object newElement = function.apply(element());
-            if (newElement != null) {
-                newQueue.enqueue(newElement);
-            }
+            consumer.accept(newQueue, element());
             enqueue(dequeue());
         }
         return newQueue;
     }
 
+    public Queue map(Function<Object, Object> function) {
+        return process((queue, element) -> queue.enqueue(function.apply(element)));
+    }
+
     public Queue filter(Predicate<Object> predicate) {
-        return map((Object element) -> {
+        return process((queue, element) -> {
             if (predicate.test(element)) {
-                return element;
-            } else {
-                return null;
+                queue.enqueue(element);
             }
         });
     }

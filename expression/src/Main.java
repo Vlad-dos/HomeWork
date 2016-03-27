@@ -21,7 +21,7 @@ public class Main {
                                 )
                         ),
                         new Const(1)
-                ).evaluate(x)
+                ).evaluate(x, 0, 0)
         );
     }
 }
