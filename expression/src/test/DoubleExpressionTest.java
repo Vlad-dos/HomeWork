@@ -1,3 +1,8 @@
+package test;
+
+
+import expression.*;
+
 public class DoubleExpressionTest {
     public static void main(final String[] args) {
         Util.checkAssert(DoubleExpressionTest.class);

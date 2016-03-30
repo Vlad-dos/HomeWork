@@ -1,3 +1,5 @@
+package expression;
+
 public class Divide extends Operation {
     public Divide(AllExpression first, AllExpression second) {
         super(first, second);

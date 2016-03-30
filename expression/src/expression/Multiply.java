@@ -1,3 +1,5 @@
+package expression;
+
 public class Multiply extends Operation {
     public Multiply(AllExpression first, AllExpression second) {
         super(first, second);

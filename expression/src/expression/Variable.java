@@ -1,7 +1,9 @@
+package expression;
+
 public class Variable implements AllExpression {
     private String name;
 
-    Variable(String name) {
+    public Variable(String name) {
         this.name = name;
     }
 

@@ -1,13 +1,15 @@
+package expression;
+
 public class Const implements AllExpression {
     private double doubleValue;
     private int intValue;
 
-    Const(int value) {
+    public Const(int value) {
         this.intValue = value;
         this.doubleValue = value;
     }
 
-    Const(double value) {
+    public Const(double value) {
         this.doubleValue = value;
     }
 

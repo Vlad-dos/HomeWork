@@ -1,3 +1,7 @@
+package test;
+
+import expression.*;
+
 public class TripleExpressionTest {
     public static void main(final String[] args) {
         Util.checkAssert(TripleExpressionTest.class);
