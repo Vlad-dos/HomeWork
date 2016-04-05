@@ -1,8 +1,14 @@
 package parser;
 
+import parser.exceptions.OverflowException;
+
 public class CheckedMultiply extends CheckedBinaryOperation {
     public CheckedMultiply(TripleExpression first, TripleExpression second) {
         super(first, second);
+    }
+
+    public CheckedMultiply() {
+        super();
     }
 
     protected int calculate(int a, int b) {
@@ -11,7 +17,7 @@ public class CheckedMultiply extends CheckedBinaryOperation {
         }
         if (a == -1) {
             if (b == Integer.MIN_VALUE) {
-                throw new ArithmeticException("Multiply overflow");
+                throw new OverflowException("Multiply overflow", a, b);
             } else {
                 return a * b;
             }
@@ -24,7 +30,7 @@ public class CheckedMultiply extends CheckedBinaryOperation {
             bMax = w;
         }
         if (!(bMin <= b && b <= bMax)) {
-            throw new ArithmeticException("Multiply overflow");
+            throw new OverflowException("Multiply overflow", a, b);
         } else {
             return a * b;
         }

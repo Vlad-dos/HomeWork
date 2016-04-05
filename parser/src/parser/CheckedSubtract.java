@@ -5,6 +5,10 @@ public class CheckedSubtract extends CheckedBinaryOperation {
         super(first, second);
     }
 
+    public CheckedSubtract() {
+        super();
+    }
+
     protected int calculate(int a, int b) {
         int aMin = (b > 0 ? (Integer.MIN_VALUE + b) : Integer.MIN_VALUE);
         int aMax = (b < 0 ? (Integer.MAX_VALUE + b) : Integer.MAX_VALUE);

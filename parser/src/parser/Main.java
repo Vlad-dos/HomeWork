@@ -1,46 +1,36 @@
 package parser;
 
+import parser.exceptions.ParserException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
 public class Main {
     public static void main(String[] args) {
+        System.out.println(new CheckedLogarithm(new Const(9), new Const(2)).evaluate(0, 0, 0));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        String text;
         try {
-            System.out.println(
-                    new CheckedAdd(
-                            new Const(Integer.MAX_VALUE / 2 + 1),
-                            new Const(Integer.MAX_VALUE / 2)
-                    ).evaluate(0, 0, 0)
-            );
-        } catch (ArithmeticException e) {
-            System.out.println(e.getMessage());
+            text = reader.readLine();
+        } catch (IOException e) {
+            System.out.println("Can't read expression.");
+            return;
+        }
+        TripleExpression expression;
+        try {
+            expression = (new ExpressionParser()).parse(text);
+        } catch (ParserException e) {
+            e.printStackTrace();
+            return;
         }
         try {
-            System.out.println(
-                    new CheckedSubtract(
-                            new Const(Integer.MIN_VALUE),
-                            new Const(0)
-                    ).evaluate(0, 0, 0)
-            );
-        } catch (ArithmeticException e) {
-            System.out.println(e.getMessage());
+            StringTokenizer tokenizer = new StringTokenizer(reader.readLine());
+        } catch (IOException e) {
+            System.out.println("Can't read variables.");
+            return;
         }
-        try {
-            System.out.println(
-                    new CheckedMultiply(
-                            new Const(Integer.MIN_VALUE),
-                            new Const(1)
-                    ).evaluate(0, 0, 0)
-            );
-        } catch (ArithmeticException e) {
-            System.out.println(e.getMessage());
-        }
-        try {
-            System.out.println(
-                    new CheckedDivide(
-                            new Const(-2),
-                            new Const(1)
-                    ).evaluate(0, 0, 0)
-            );
-        } catch (ArithmeticException e) {
-            System.out.println(e.getMessage());
-        }
+        System.out.println(expression.evaluate(0, 0, 1));
     }
 }

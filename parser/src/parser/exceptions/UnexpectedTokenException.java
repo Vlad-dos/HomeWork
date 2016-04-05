@@ -1,4 +1,4 @@
-package parser;
+package parser.exceptions;
 
 public class UnexpectedTokenException extends ParserException {
     public char token;

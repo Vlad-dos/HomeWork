@@ -1,166 +1,153 @@
 package parser;
 
-public class ExpressionParser implements Parser {
+import parser.exceptions.NumberSizeException;
+import parser.exceptions.ParserException;
+import parser.exceptions.UnexpectedTokenException;
+import parser.exceptions.WrongBracketSequenceException;
 
+public class ExpressionParser implements Parser {
     private int position = 0;
+    private int lastPosition = 0;
     private String text;
-    private Token lastToken = new Token(true);
+
+    private void resetToken() {
+        position = lastPosition;
+    }
 
     private boolean isDigit(char value) {
         return value >= '0' && value <= '9';
     }
 
-    private class Token {
-        public boolean isConst;
-        public boolean isCloseBracket;
-        public boolean isOperation;
-        public boolean isVariable;
-        public boolean isNegate;
-        public boolean isEnd;
-        public boolean isOpenBracket;
-        public boolean isBegin;
-
-        public int number;
-        public char value;
-
-        public char getOperation() {
-            return value;
-        }
-
-        Token() {
-        }
-
-        Token(boolean begin) {
-            isBegin = begin;
-        }
-
-        public boolean isBeginState() {
-            return (isNegate || isBegin || isOpenBracket || isOperation);
-        }
+    private boolean isLetter(char value) {
+        return value >= 'a' && value <= 'z';
     }
 
-    private Token getNextToken() throws ParserException {
-        Token token = new Token();
+    private TripleExpression getNextToken(boolean bracketExpected, boolean valueExpected) throws ParserException {
+        lastPosition = position;
         char first = ' ';
-        boolean correct = false;
         while (first == ' ' || first == '\t') {
             if (position >= text.length()) {
-                correct = !lastToken.isBeginState();
-                token.isEnd = correct;
-                first = '\n';
+                if (!bracketExpected && !valueExpected) {
+                    return null;
+                } else {
+                    throw new WrongBracketSequenceException();
+                }
             } else {
                 first = text.charAt(position++);
             }
         }
-        if (lastToken.isBeginState()) {
-            correct = true;
-            if (isDigit(first) || (position + 1 < text.length() && first == '-' && isDigit(text.charAt(position + 1)))) {
-                token.isConst = true;
+        if (valueExpected) {
+            if (isDigit(first) || (position < text.length() && first == '-' && isDigit(text.charAt(position)))) {
                 int beginIndex = position - 1;
                 while (position < text.length() && isDigit(text.charAt(position))) {
                     position++;
                 }
                 try {
-                    token.number = Integer.parseInt(text.substring(beginIndex, position));
+                    return new Const(Integer.parseInt(text.substring(beginIndex, position)));
                 } catch (NumberFormatException e) {
-                    throw new ParserException("Not an int number", e);
+                    throw new NumberSizeException(text.substring(beginIndex, position), position);
                 }
-            } else switch (first) {
-                case 'x':
-                case 'y':
-                case 'z':
-                    token.isVariable = true;
-                    token.value = first;
-                    break;
+            }
+            if (isLetter(first)) {
+                int beginIndex = position - 1;
+                while (position < text.length() && isLetter(text.charAt(position))) {
+                    position++;
+                }
+                String name = text.substring(beginIndex, position);
+                switch (name) {
+                    case "x":
+                    case "y":
+                    case "z":
+                        return new Variable(name);
+                    case "sqrt":
+                        return new CheckedSqrt(getNextToken(bracketExpected, true));
+                    case "abs":
+                        return new CheckedAbs(getNextToken(bracketExpected, true));
+                    default:
+                        throw new UnexpectedTokenException(first, position);
+                }
+            }
+            switch (first) {
                 case '-':
-                    token.isNegate = true;
-                    break;
+                    return new CheckedNegate(getNextToken(bracketExpected, true));
                 case '(':
-                    token.isOpenBracket = true;
-                    break;
+                    return parseBinaryOperation(true, 0);
                 default:
-                    correct = false;
+                    throw new UnexpectedTokenException(first, position);
             }
         } else {
-            if (first == '+' || first == '-' || first == '*' || first == '/') {
-                token.isOperation = true;
-                token.value = first;
-                correct = true;
-            }
-            if (first == ')') {
-                token.isCloseBracket = true;
-                correct = true;
-            }
-        }
-        if (!correct) {
-            throw new UnexpectedTokenException(first, position);
-        } else {
-            lastToken = token;
-            return token;
-        }
-    }
-
-    private TripleExpression processValues(Token token, boolean bracketExpected) throws ParserException {
-        TripleExpression expression = null;
-        if (token.isConst) {
-            expression = new Const(token.number);
-        } else if (token.isVariable) {
-            expression = new Variable(String.valueOf(token.value));
-        } else if (token.isNegate) {
-            Token token2 = getNextToken();
-            expression = processValues(token2, bracketExpected);
-            expression = new CheckedNegate(expression);
-        } else if (token.isOpenBracket) {
-            expression = process(true);
-        }
-        if (expression == null) {
-            throw new UnexpectedTokenException();
-        }
-        return expression;
-    }
-
-    private TripleExpression process(boolean bracketExpected) throws ParserException {
-        Token token = getNextToken();
-        TripleExpression first = processValues(token, bracketExpected);
-        TripleExpression second;
-        token = getNextToken();
-
-        if (token.isOperation) {
-            if (token.value == '*' || token.value == '/') {
-                while (token.isOperation && (token.value == '*' || token.value == '/')) {
-                    Token tmpToken = getNextToken();
-                    second = processValues(tmpToken, bracketExpected);
-                    if (token.value == '*') {
-                        first = new CheckedMultiply(first, second);
-                    } else {
-                        first = new CheckedDivide(first, second);
+            switch (first) {
+                case '*':
+                    if (text.charAt(position) == '*') {
+                        position++;
+                        return new CheckedPow();
                     }
-                    token = getNextToken();
+                    return new CheckedMultiply();
+                case '/':
+                    if (text.charAt(position) == '/') {
+                        position++;
+                        return new CheckedLogarithm();
+                    }
+                    return new CheckedDivide();
+                case '+':
+                    return new CheckedAdd();
+                case '-':
+                    return new CheckedSubtract();
+                case ')':
+                    if (bracketExpected) {
+                        return null;
+                    } else {
+                        throw new WrongBracketSequenceException();
+                    }
+                default:
+                    throw new UnexpectedTokenException(first, position);
+            }
+        }
+    }
+
+    CheckedBinaryOperation[][] levels = new CheckedBinaryOperation[][]{
+            {new CheckedAdd(), new CheckedSubtract()},
+            {new CheckedDivide(), new CheckedMultiply()},
+            {new CheckedLogarithm(), new CheckedPow()}
+    };
+
+    private TripleExpression parseBinaryOperation(boolean bracketExpected, int level) throws ParserException {
+        if (level >= levels.length) {
+            return getNextToken(bracketExpected, true);
+        }
+        TripleExpression first = parseBinaryOperation(bracketExpected, level + 1);
+        TripleExpression temp = getNextToken(bracketExpected, false);
+        while (temp != null) {
+            CheckedBinaryOperation operation = null;
+            for (CheckedBinaryOperation i : levels[level]) {
+                if (temp.getClass() == i.getClass()) {
+                    operation = (CheckedBinaryOperation) temp;
                 }
             }
-        }
-        if (token.isOperation) {
-            second = process(bracketExpected);
-            if (token.value == '-') {
-                return new CheckedSubtract(first, second);
+            if (operation == null) {
+                if (level == 0) {
+                    throw new UnexpectedTokenException(text.charAt(position - 1), position - 1);
+                } else {
+                    resetToken();
+                    return first;
+                }
             }
-            if (token.value == '+') {
-                return new CheckedAdd(first, second);
-            }
+            TripleExpression second = parseBinaryOperation(bracketExpected, level + 1);
+            operation.setFirst(first);
+            operation.setSecond(second);
+            first = operation;
+            temp = getNextToken(bracketExpected, false);
         }
-        if ((token.isEnd && !bracketExpected) || (token.isCloseBracket && bracketExpected)) {
-            return first;
-        }
-        throw new ParserException("Wrong bracket sequence");
+        if (level != 0) resetToken();
+        return first;
     }
 
     public TripleExpression parse(String expression) throws ParserException {
         text = expression;
         position = 0;
-        lastToken = new Token(true);
-        TripleExpression result = process(false);
+        TripleExpression result = parseBinaryOperation(false, 0);
         if (position < text.length()) {
-            throw new ParserException("Wrong bracket sequence");
+            throw new WrongBracketSequenceException();
         }
         return result;
     }

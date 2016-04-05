@@ -5,6 +5,10 @@ public class CheckedDivide extends CheckedBinaryOperation {
         super(first, second);
     }
 
+    public CheckedDivide() {
+        super();
+    }
+
     protected int calculate(int a, int b) {
         if (b == 0 || (b == -1 && a == Integer.MIN_VALUE)) {
             throw new ArithmeticException("Division by zero");
