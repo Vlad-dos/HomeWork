@@ -1,15 +1,22 @@
-package parser;
+package generics;
 
-import parser.exceptions.NumberSizeException;
-import parser.exceptions.ParserException;
-import parser.exceptions.UnexpectedTokenException;
-import parser.exceptions.WrongBracketSequenceException;
+import calculables.Calculable;
+import exceptions.NumberSizeException;
+import exceptions.ParserException;
+import exceptions.UnexpectedTokenException;
+import exceptions.WrongBracketSequenceException;
+import operations.*;
 
 @SuppressWarnings("Duplicates")
-public class ExpressionParser implements Parser {
+public class ExpressionParser<T> {
     private int position = 0;
     private int lastPosition = 0;
     private String text;
+    CalculableCreator<T> creator;
+
+    public ExpressionParser(CalculableCreator<T> creator) {
+        this.creator = creator;
+    }
 
     private void resetToken() {
         position = lastPosition;
@@ -23,7 +30,7 @@ public class ExpressionParser implements Parser {
         return value >= 'a' && value <= 'z';
     }
 
-    private TripleExpression getNextToken(boolean bracketExpected, boolean valueExpected) throws ParserException {
+    private TripleExpression<T> getNextToken(boolean bracketExpected, boolean valueExpected) throws ParserException {
         lastPosition = position;
         char first = ' ';
         while (first == ' ' || first == '\t') {
@@ -43,11 +50,13 @@ public class ExpressionParser implements Parser {
                 while (position < text.length() && isDigit(text.charAt(position))) {
                     position++;
                 }
+                Calculable<T> temp = creator.create();
                 try {
-                    return new Const(Integer.parseInt(text.substring(beginIndex, position)));
+                    temp.parse(text.substring(beginIndex, position));
                 } catch (NumberFormatException e) {
                     throw new NumberSizeException(text.substring(beginIndex, position), position);
                 }
+                return new Const<>(temp);
             }
             if (isLetter(first)) {
                 int beginIndex = position - 1;
@@ -59,42 +68,41 @@ public class ExpressionParser implements Parser {
                     case "x":
                     case "y":
                     case "z":
-                        return new Variable(name);
-                    case "sqrt":
-                        return new CheckedSqrt(getNextToken(bracketExpected, true));
+                        return new Variable<>(name);
                     case "abs":
-                        return new CheckedAbs(getNextToken(bracketExpected, true));
+                        return new Abs<>(getNextToken(bracketExpected, true));
+                    case "square":
+                        return new Square<>(getNextToken(bracketExpected, true));
                     default:
                         throw new UnexpectedTokenException(first, position);
                 }
             }
             switch (first) {
                 case '-':
-                    return new CheckedNegate(getNextToken(bracketExpected, true));
+                    return new Negate<>(getNextToken(bracketExpected, true));
                 case '(':
                     return parseBinaryOperation(true, 0);
                 default:
                     throw new UnexpectedTokenException(first, position);
             }
         } else {
-            switch (first) {
-                case '*':
-                    if (text.charAt(position) == '*') {
-                        position++;
-                        return new CheckedPow();
-                    }
-                    return new CheckedMultiply();
-                case '/':
-                    if (text.charAt(position) == '/') {
-                        position++;
-                        return new CheckedLogarithm();
-                    }
-                    return new CheckedDivide();
-                case '+':
-                    return new CheckedAdd();
-                case '-':
-                    return new CheckedSubtract();
-                case ')':
+            int beginIndex = position - 1;
+            while (position < text.length() && isLetter(text.charAt(position))) {
+                position++;
+            }
+            String name = text.substring(beginIndex, position);
+            switch (name) {
+                case "*":
+                    return new Multiply<>();
+                case "/":
+                    return new Divide<>();
+                case "+":
+                    return new Add<>();
+                case "mod":
+                    return new Mod<>();
+                case "-":
+                    return new Subtract<>();
+                case ")":
                     if (bracketExpected) {
                         return null;
                     } else {
@@ -106,23 +114,22 @@ public class ExpressionParser implements Parser {
         }
     }
 
-    CheckedBinaryOperation[][] levels = new CheckedBinaryOperation[][]{
-            {new CheckedAdd(), new CheckedSubtract()},
-            {new CheckedDivide(), new CheckedMultiply()},
-            {new CheckedLogarithm(), new CheckedPow()}
+    BinaryOperation[][] levels = new BinaryOperation[][]{
+            {new Add<T>(), new Subtract<T>()},
+            {new Divide<T>(), new Multiply<T>(), new Mod<T>()},
     };
 
-    private TripleExpression parseBinaryOperation(boolean bracketExpected, int level) throws ParserException {
+    private TripleExpression<T> parseBinaryOperation(boolean bracketExpected, int level) throws ParserException {
         if (level >= levels.length) {
             return getNextToken(bracketExpected, true);
         }
-        TripleExpression first = parseBinaryOperation(bracketExpected, level + 1);
-        TripleExpression temp = getNextToken(bracketExpected, false);
+        TripleExpression<T> first = parseBinaryOperation(bracketExpected, level + 1);
+        TripleExpression<T> temp = getNextToken(bracketExpected, false);
         while (temp != null) {
-            CheckedBinaryOperation operation = null;
-            for (CheckedBinaryOperation i : levels[level]) {
+            BinaryOperation<T> operation = null;
+            for (BinaryOperation i : levels[level]) {
                 if (temp.getClass() == i.getClass()) {
-                    operation = (CheckedBinaryOperation) temp;
+                    operation = (BinaryOperation<T>) temp;
                 }
             }
             if (operation == null) {
@@ -133,7 +140,7 @@ public class ExpressionParser implements Parser {
                     return first;
                 }
             }
-            TripleExpression second = parseBinaryOperation(bracketExpected, level + 1);
+            TripleExpression<T> second = parseBinaryOperation(bracketExpected, level + 1);
             operation.setFirst(first);
             operation.setSecond(second);
             first = operation;
@@ -143,13 +150,14 @@ public class ExpressionParser implements Parser {
         return first;
     }
 
-    public TripleExpression parse(String expression) throws ParserException {
+    public TripleExpression<T> parse(String expression) throws ParserException {
         text = expression;
         position = 0;
-        TripleExpression result = parseBinaryOperation(false, 0);
+        TripleExpression<T> result = parseBinaryOperation(false, 0);
         if (position < text.length()) {
             throw new WrongBracketSequenceException();
         }
         return result;
     }
 }
+
