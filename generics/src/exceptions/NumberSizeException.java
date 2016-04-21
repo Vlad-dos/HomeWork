@@ -5,7 +5,7 @@ public class NumberSizeException extends ParserException {
     public int position;
 
     public NumberSizeException(String number, int position) {
-        super();
+        super("number " + number + " at " + position + " too big");
         this.number = number;
         this.position = position;
     }

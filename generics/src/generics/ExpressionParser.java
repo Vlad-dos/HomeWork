@@ -38,7 +38,7 @@ public class ExpressionParser<T> {
                 if (!bracketExpected && !valueExpected) {
                     return null;
                 } else {
-                    throw new WrongBracketSequenceException();
+                    throw new WrongBracketSequenceException("at " + position);
                 }
             } else {
                 first = text.charAt(position++);
@@ -106,7 +106,7 @@ public class ExpressionParser<T> {
                     if (bracketExpected) {
                         return null;
                     } else {
-                        throw new WrongBracketSequenceException();
+                        throw new WrongBracketSequenceException("at " + position);
                     }
                 default:
                     throw new UnexpectedTokenException(first, position);
@@ -155,7 +155,7 @@ public class ExpressionParser<T> {
         position = 0;
         TripleExpression<T> result = parseBinaryOperation(false, 0);
         if (position < text.length()) {
-            throw new WrongBracketSequenceException();
+            throw new WrongBracketSequenceException("at " + position);
         }
         return result;
     }
