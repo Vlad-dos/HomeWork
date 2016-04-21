@@ -85,7 +85,7 @@ function parse(text) {
         } else {
 
             var unary = function(operation) {
-                tmp = stack.pop();
+                var tmp = stack.pop();
                 stack.push(operation(tmp));
             }
             var binary = function(operation) {
