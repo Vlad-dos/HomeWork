@@ -6,17 +6,14 @@ function cnst(value) {
     };
 }
 
+var variables = ["x", "y", "z"];
+
 function variable(name) {
-    return function (x, y, z) {
-        switch (name) {
-            case "x":
-                return x;
-            case "y":
-                return y;
-            case "z":
-                return z;
-            default:
-                return 0;
+    return function () {
+        for (var i = 0; i < variables.length; i++) {
+            if (name === variables[i]) {
+                return arguments[i];
+            }
         }
     };
 }
@@ -86,10 +83,9 @@ function parse(text) {
     tokens.forEach(function (token) {
         if (token[0] >= '0' && token[0] <= '9' || (token[0] === '-' && token[1] >= '0' && token[1] <= '9')) {
             stack.push(cnst(parseInt(token)));
-        } else if (token >= "x" && token <= "z") {
+        } else if (variables.indexOf(token) != -1) {
             stack.push(variable(token));
         } else {
-
             var unary = function(operation) {
                 var tmp = stack.pop();
                 stack.push(operation(tmp));
@@ -98,7 +94,6 @@ function parse(text) {
                 var tmp = stack.pop();
                 stack.push(operation(stack.pop(), tmp));
             }
-
             switch (token) {
                 case "+":
                     binary(add);
