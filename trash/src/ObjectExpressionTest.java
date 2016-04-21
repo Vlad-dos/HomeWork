@@ -1,5 +1,3 @@
-package test;
-
 import java.util.List;
 
 import static expression.Util.*;
@@ -8,8 +6,8 @@ import static expression.Util.*;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ObjectExpressionTest extends BaseTest<JSEngine> {
-    public static final Dialect OBJECT = dialect("new Variable('%s')", "new Const(%s)", "new %s(%s)", "new %s(%s, %s)");
-    public static final Ops OPS = ops()
+    public static final Dialect OBJECT = BaseTest.dialect("new Variable('%s')", "new Const(%s)", "new %s(%s)", "new %s(%s, %s)");
+    public static final Ops OPS = BaseTest.ops()
             .binary("+", "Add", "+", (a, b) -> a + b)
             .binary("-", "Subtract", "-", (a, b) -> a - b)
             .binary("*", "Multiply", "*", (a, b) -> a * b)
@@ -17,7 +15,7 @@ public class ObjectExpressionTest extends BaseTest<JSEngine> {
             .unary("negate", "Negate", "negate", a -> -a);
     public final double D = 1e-4;
 
-    final List<int[]> simplifications = list(
+    final List<int[]> simplifications = Util.list(
             new int[]{1, 1, 1},
             new int[]{1, 1, 1},
             new int[]{1, 1, 1},
@@ -71,13 +69,13 @@ public class ObjectExpressionTest extends BaseTest<JSEngine> {
                 final Engine.Result<String> result = engine.parsedToString();
                 final int length = result.value.length();
                 final int expected = simplifications[variable];
-                assertTrue("Simplified length too long: " + length + " instead of " + expected + result.context, length <= expected);
+                Util.assertTrue("Simplified length too long: " + length + " instead of " + expected + result.context, length <= expected);
             }
-            for (int i = 1; i <= N; i += 1) {
+            for (int i = 1; i <= BaseTest.N; i += 1) {
                 final double di = variable == 0 ? D : 0;
-                for (int j = 1; j <= N; j += 1) {
+                for (int j = 1; j <= BaseTest.N; j += 1) {
                     final double dj = variable == 1 ? D : 0;
-                    for (int k = 1; k <= N; k += 1) {
+                    for (int k = 1; k <= BaseTest.N; k += 1) {
                         final double dk = variable == 2 ? D : 0;
                         final double expected = (test.answer.evaluate(i + di, j + dj, k + dk) - test.answer.evaluate(i - di, j - dj, k - dk)) / D / 2;
                         evaluate(new double[]{i, j, k}, expected, 1e-5);
@@ -102,11 +100,11 @@ public class ObjectExpressionTest extends BaseTest<JSEngine> {
     private void testToString(final String expression, final String expected) {
         engine.parse(expression);
         final Engine.Result<String> result = engine.parsedToString();
-        assertEquals(result.context, result.value, expected);
+        Util.assertEquals(result.context, result.value, expected);
     }
 
     public static void main(final String... args) {
-        final int mode = mode(args, ObjectExpressionTest.class, "easy", "hard", "bonus");
+        final int mode = BaseTest.mode(args, ObjectExpressionTest.class, "easy", "hard", "bonus");
         new ObjectExpressionTest(mode >= 1, mode >= 2, ExpressionTest.POLISH).test();
     }
 }

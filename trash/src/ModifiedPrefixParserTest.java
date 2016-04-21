@@ -1,7 +1,3 @@
-package test;
-
-import static expression.Util.list;
-
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
