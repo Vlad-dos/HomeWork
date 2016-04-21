@@ -37,10 +37,12 @@ function unaryOperation(operation) {
     };
 }
 
-/*var add = binaryOperation((a, b) => a + b);
- var multiply = binaryOperation((a, b) => a * b);
- var subtract = binaryOperation((a, b) => a - b);
- var divide = binaryOperation((a, b) => a / b);*/
+/*
+var add = binaryOperation((a, b) => a + b);
+var multiply = binaryOperation((a, b) => a * b);
+var subtract = binaryOperation((a, b) => a - b);
+var divide = binaryOperation((a, b) => a / b);
+*/
 
 var add = binaryOperation(function (a, b) {
     return a + b;
@@ -81,42 +83,43 @@ function parse(text) {
         } else if (token >= "x" && token <= "z") {
             stack.push(variable(token));
         } else {
+
+            var unary = function(operation) {
+                tmp = stack.pop();
+                stack.push(operation(tmp));
+            }
+            var binary = function(operation) {
+                var tmp = stack.pop();
+                stack.push(operation(stack.pop(), tmp));
+            }
+
             switch (token) {
                 case "+":
-                    var tmp = stack.pop();
-                    stack.push(add(stack.pop(), tmp));
+                    binary(add);
                     break;
                 case "*":
-                    tmp = stack.pop();
-                    stack.push(multiply(stack.pop(), tmp));
+                    binary(multiply);
                     break;
                 case "/":
-                    tmp = stack.pop();
-                    stack.push(divide(stack.pop(), tmp));
+                    binary(divide);
                     break;
                 case "-":
-                    tmp = stack.pop();
-                    stack.push(subtract(stack.pop(), tmp));
+                    binary(subtract);
                     break;
                 case "negate":
-                    tmp = stack.pop();
-                    stack.push(negate(tmp));
+                    unary(negate);
                     break;
                 case "abs":
-                    tmp = stack.pop();
-                    stack.push(abs(tmp));
+                    unary(abs);
                     break;
                 case "log":
-                    tmp = stack.pop();
-                    stack.push(log(tmp));
+                    unary(log);
                     break;
                 case "%":
-                    tmp = stack.pop();
-                    stack.push(mod(stack.pop(), tmp));
+                    binary(mod);
                     break;
                 case "**":
-                    tmp = stack.pop();
-                    stack.push(power(stack.pop(), tmp));
+                    binary(power);
                     break;
             }
         }
