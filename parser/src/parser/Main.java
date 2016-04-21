@@ -1,6 +1,9 @@
 package parser;
 
+import parser.exceptions.NumberSizeException;
 import parser.exceptions.ParserException;
+import parser.exceptions.UnexpectedTokenException;
+import parser.exceptions.WrongBracketSequenceException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +24,15 @@ public class Main {
         TripleExpression expression;
         try {
             expression = (new ExpressionParser()).parse(text);
+        } catch (UnexpectedTokenException e) {
+            System.out.println("Unexpected token: " + e.token + " at " + e.position);
+            return;
+        } catch (NumberSizeException e) {
+            System.out.println("Number size too big: " + e.number);
+            return;
+        } catch (WrongBracketSequenceException e) {
+            System.out.println("Wrong Bracket Sequence");
+            return;
         } catch (ParserException e) {
             e.printStackTrace();
             return;
@@ -31,6 +43,10 @@ public class Main {
             System.out.println("Can't read variables.");
             return;
         }
-        System.out.println(expression.evaluate(0, 0, 1));
+        try {
+            System.out.println(expression.evaluate(0, 0, 1));
+        } catch (ArithmeticException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

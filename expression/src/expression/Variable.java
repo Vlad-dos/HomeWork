@@ -22,7 +22,7 @@ public class Variable implements AllExpression {
         if (name.equals("y")) {
             return y;
         }
-        if (name.equals("z")) {
+        if ("z".equals(name)) {
             return z;
         }
         return 0;

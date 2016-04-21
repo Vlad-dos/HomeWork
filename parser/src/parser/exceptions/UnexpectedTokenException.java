@@ -5,7 +5,7 @@ public class UnexpectedTokenException extends ParserException {
     public int position;
 
     public UnexpectedTokenException(char token, int position) {
-        super();
+        super(token + " at " + position);
         this.token = token;
         this.position = position;
     }

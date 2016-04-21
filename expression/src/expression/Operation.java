@@ -1,7 +1,7 @@
 package expression;
 
 public abstract class Operation implements AllExpression {
-    protected AllExpression first, second;
+    private AllExpression first, second;
 
     public Operation(AllExpression first, AllExpression second) {
         this.first = first;
