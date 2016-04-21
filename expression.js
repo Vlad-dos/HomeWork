@@ -42,6 +42,12 @@ var add = binaryOperation((a, b) => a + b);
 var multiply = binaryOperation((a, b) => a * b);
 var subtract = binaryOperation((a, b) => a - b);
 var divide = binaryOperation((a, b) => a / b);
+var mod = binaryOperation((a, b) => a % b);
+var power = binaryOperation((a, b) => Math.pow(a, b));
+
+var negate = unaryOperation((a) => -a);
+var log = unaryOperation((a) => Math.log(a));
+var abs = unaryOperation((a) => Math.abs(a));
 */
 
 var add = binaryOperation(function (a, b) {
