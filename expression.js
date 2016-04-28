@@ -14,7 +14,7 @@ function variable(name) {
     };
 }
 
-function operation(operation) {
+function operation(func) {
     return function () {
         var args = arguments;
         return function () {
@@ -22,7 +22,7 @@ function operation(operation) {
             for (var i = 0; i < args.length; i++) {
                 argsApply.push(args[i].apply(null, arguments));
             }
-            return operation.apply(null, argsApply);
+            return func.apply(null, argsApply);
         };
     };
 }

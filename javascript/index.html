@@ -24,10 +24,21 @@
 
     var global = global || window;
 </script>
-<script src="expression.js" charset="UTF-8"></script>
+<script src="objectExpression.js" charset="UTF-8"></script>
 <script>
-    var t = med(cnst(1), cnst(3), cnst(2));
-    println(t(1, 0, 0));
+    var expr2 = new Subtract(
+            new Multiply(
+                    new Const(0),
+                    new Variable("x")
+            ),
+            new Variable("x")
+    );
+
+    println(expr2.toString());
+    println(expr2.simplify().toString());
+    println(expr2.toString() + "  =  " + expr2.evaluate(1, 2, 3));
+    println(expr2.diff('x').toString());
+    println(expr2.diff('x').simplify().toString());
 </script>
 </body>
 </html>

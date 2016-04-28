@@ -14,7 +14,7 @@ function variable(name) {
     };
 }
 
-function operation(operation) {
+function operation(func) {
     return function () {
         var args = arguments;
         return function () {
@@ -22,25 +22,10 @@ function operation(operation) {
             for (var i = 0; i < args.length; i++) {
                 argsApply.push(args[i].apply(null, arguments));
             }
-            return operation.apply(null, argsApply);
+            return func.apply(null, argsApply);
         };
     };
 }
-
-/*
-var add = operation((a, b) => a + b);
-var multiply = operation((a, b) => a * b);
-var subtract = operation((a, b) => a - b);
-var divide = operation((a, b) => a / b);
-var mod = operation((a, b) => a % b);
-var power = operation((a, b) => Math.pow(a, b));
-
-var negate = operation((a) => -a);
-var log = operation((a) => Math.log(a));
-var abs = operation((a) => Math.abs(a));
-
-var med = operation((a, b, c) => [a, b, c].sort()[1]);
-*/
 
 var add = operation(function (a, b) {
     return a + b;
@@ -69,11 +54,11 @@ var med = function(pos) {
     return operation(function () {
         var args = [];
         for (var i = 0; i < arguments.length; i++) {
-        args.push(arguments[i]);
+            args.push(arguments[i]);
         }
         return args.sort()[pos];
     });
-}
+};
 
 var med3 = med(1);
 var med15 = med(7);

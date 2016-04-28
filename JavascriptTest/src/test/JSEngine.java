@@ -86,7 +86,6 @@ public class JSEngine implements Engine {
 
     public static class IO {
         private final ScriptEngine engine;
-
         public IO(final ScriptEngine engine) {
             this.engine = engine;
         }
