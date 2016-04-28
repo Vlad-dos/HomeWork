@@ -1,8 +1,5 @@
 "use strict";
 
-//TODO: diff for unary operations
-//TODO: CopyPaste Add, Divide...
-
 function add(a, b) {
     return a + b;
 }
@@ -59,41 +56,50 @@ function cosDiff(expr, varName) {
 }
 
 function Const(constValue) {
-    this.value = constValue;
+    var value = constValue;
+
+    this.evaluate = function () {
+        return value;
+    };
+
+    this.toString = function () {
+        return value.toString();
+    };
+
+    this.diff = function () {
+        return new Const(0);
+    };
+
+    this.simplify = function () {
+        return this;
+    };
 }
-Const.prototype.evaluate = function () {
-    return this.value;
-};
-
-Const.prototype.toString = function () {
-    return this.value.toString();
-};
-
-Const.prototype.diff = function () {
-    return new Const(0);
-};
 
 Variable.variables = {"x": 0, "y": 1, "z": 2};
 function Variable(varName) {
-    this.name = varName;
+    var name = varName;
+
+    this.evaluate = function () {
+        return arguments[Variable.variables[name]];
+    };
+
+    this.toString = function () {
+        return name;
+    };
+
+    this.diff = function (varName) {
+        if (name === varName) {
+            return new Const(1);
+        } else {
+            return new Const(0);
+        }
+    };
+
+    this.simplify = function () {
+        return this;
+    };
 }
-Variable.prototype.evaluate = function () {
-    return arguments[Variable.variables[this.name]];
-};
 
-Variable.prototype.toString = function () {
-    return this.name;
-};
-
-Variable.prototype.diff = function (varName) {
-    if (this.name === varName) {
-        return new Const(1);
-    } else {
-        return new Const(0);
-    }
-};
-
-var depth = "";
 function Operation(func, funcName, diffFunc, args) {
     var expressions = [];
     for (var i = 0; i < args.length; i++) {
@@ -122,34 +128,106 @@ function Operation(func, funcName, diffFunc, args) {
     this.diff = function(varName) {
         return diffFunc(expressions, varName);
     }
+
+    this.simplify = function () {
+        var allConst = true;
+        var newExpr = [];
+        for (var i = 0; i < expressions.length; i++) {
+            var tmp = expressions[i].simplify();
+            newExpr.push(tmp);
+            if (!(newExpr[i] instanceof Const)) {
+                allConst = false;
+            }
+        }
+        if (allConst) {
+            return new Const(this.evaluate());
+        } else {
+            return this.localSimplify(newExpr);
+        }
+    };
 }
 
 function Add() {
     Operation.call(this, add, '+', addDiff, arguments);
+
+    this.localSimplify = function(expr) {
+        if (expr[0] instanceof Const && expr[0].evaluate() === 0) {
+            return expr[1];
+        } else if (expr[1] instanceof Const && expr[1].evaluate() === 0) {
+            return expr[0];
+        } else {
+            return this;
+        }
+    }
 }
 
 function Subtract() {
     Operation.call(this, subtract, '-', subDiff, arguments);
+
+    this.localSimplify = function(expr) {
+        if (expr[0] instanceof Const && expr[0].evaluate() === 0) {
+            return new Negate(expr[1]);
+        } else if (expr[1] instanceof Const && expr[1].evaluate() === 0) {
+            return expr[0];
+        } else {
+            return this;
+        }
+    }
 }
 
 function Multiply() {
     Operation.call(this, multiply, '*', mulDiff, arguments);
+
+    this.localSimplify = function(expr) {
+        if (expr[0] instanceof Const && expr[0].evaluate() === 1) {
+            return expr[1];
+        } else if (expr[1] instanceof Const && expr[1].evaluate() === 1) {
+            return expr[0];
+        } else if ((expr[1] instanceof Const && expr[1].evaluate() === 0) ||
+                   (expr[0] instanceof Const && expr[0].evaluate() === 0)) {
+            return new Const(0);
+        } else {
+            return this;
+        }
+    }
 }
 
 function Divide() {
     Operation.call(this, divide, '/', divDiff, arguments);
+
+    this.localSimplify = function(expr) {
+        if (expr[0] instanceof Const && expr[0].evaluate() == 0) {
+            return new Const(0);
+        } else if (expr[1] instanceof Const && expr[1].evaluate() == 1) {
+            return expr[0];
+        } else {
+            return this;
+        }
+    }
 }
 
 function Sin() {
     Operation.call(this, Math.sin, 'sin', sinDiff, arguments);
+
+    this.localSimplify = function() {
+        return this;
+    }
 }
 
 function Cos() {
     Operation.call(this, Math.cos, 'cos', cosDiff, arguments);
+
+    this.localSimplify = function() {
+        return this;
+    }
 }
 
 function Negate() {
     Operation.call(this, negate, 'negate', negDiff, arguments);
+
+    this.localSimplify = function(expr) {
+        return this;
+    }
 }
 
 var operations = {
@@ -197,7 +275,8 @@ function parse(text) {
             var expr = Object.create(operations[token].func.prototype);
             operations[token].func.apply(expr, args);
             stack.push(expr);
-        } else if (token) {
+        }
+        else if (token) {
             stack.push(new Const(parseInt(token)));
         }
     });

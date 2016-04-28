@@ -26,6 +26,11 @@
 </script>
 <script src="objectExpression.js" charset="UTF-8"></script>
 <script>
+
+    var test = parse('3 y -').diff('x').simplify();
+
+    println("test: ", test.toString());
+
     var expr2 = new Subtract(
             new Multiply(
                     new Const(0),
@@ -34,11 +39,24 @@
             new Variable("x")
     );
 
+    var expr = new Subtract(
+        new Multiply(
+            new Const(2),
+            new Variable("x")
+        ),
+        new Const(3)
+    );
+
+    println("run");
+
+    println(expr.toString());
+    println(expr.evaluate(1, 2, 3));
+
     println(expr2.toString());
-    println(expr2.simplify().toString());
+    //println(expr2.simplify().toString());
     println(expr2.toString() + "  =  " + expr2.evaluate(1, 2, 3));
     println(expr2.diff('x').toString());
-    println(expr2.diff('x').simplify().toString());
+    //println(expr2.diff('x').simplify().toString());
 </script>
 </body>
 </html>
