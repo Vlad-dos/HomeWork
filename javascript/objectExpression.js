@@ -21,16 +21,16 @@ function negate(a) {
 }
 
 function addDiff(expr, varName)  {
-    return new Add(expr[0].diff(varName), expr[1].diff(varName))
+    return new Add(expr[0].diff(varName), expr[1].diff(varName));
 }
 function subDiff(expr, varName)  {
-    return new Subtract(expr[0].diff(varName), expr[1].diff(varName))
+    return new Subtract(expr[0].diff(varName), expr[1].diff(varName));
 }
 function mulDiff(expr, varName)  {
     return new Add(
         new Multiply(expr[0].diff(varName), expr[1]),
         new Multiply(expr[0], expr[1].diff(varName))
-    )
+    );
 }
 
 function divDiff(expr, varName)  {
@@ -44,7 +44,7 @@ function divDiff(expr, varName)  {
 }
 
 function negDiff(expr, varName)  {
-    return new Negate(expr[0].diff(varName))
+    return new Negate(expr[0].diff(varName));
 }
 
 function sinDiff(expr, varName) {
@@ -97,7 +97,7 @@ function Operation(func, funcName, diffFunc, args) {
         expressions.push(args[i]);
     }
 
-    var operation = func
+    var operation = func;
     var name = funcName;
 
     this.evaluate = function () {
@@ -118,7 +118,7 @@ function Operation(func, funcName, diffFunc, args) {
 
     this.diff = function(varName) {
         return diffFunc(expressions, varName);
-    }
+    };
 }
 
 function Add() {
@@ -151,34 +151,34 @@ function Negate() {
 
 var operations = {
     "+": {
-        func:Add,
+        Func: Add,
         size:2
     },
     "-": {
-        func:Subtract,
+        Func: Subtract,
         size:2
     },
     "*": {
-        func:Multiply,
+        Func: Multiply,
         size:2
     },
     "/": {
-        func:Divide,
+        Func: Divide,
         size:2
     },
     "negate": {
-        func:Negate,
+        Func: Negate,
         size:1
     },
     "sin": {
-        func:Sin,
+        Func: Sin,
         size:1
     },
     "cos": {
-        func:Cos,
+        Func: Cos,
         size:1
     }
-}
+};
 
 function parse(text) {
     var stack = [];
@@ -191,7 +191,7 @@ function parse(text) {
                 args.push(stack.pop());
             }
             args.reverse();
-            var expr = Object.create(operations[token].func.prototype);
+            var expr = Object.create(operations[token].Func.prototype);
             operations[token].func.apply(expr, args);
             stack.push(expr);
         } else if (token) {
