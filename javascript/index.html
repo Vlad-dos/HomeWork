@@ -10,9 +10,14 @@
 
     var logArea = document.getElementById("out");
     function println() {
+        println.cnt++;
+        if (println.cnt > 50) {
+            return;
+        }
         print.apply(null, arguments);
         print("\n");
     }
+    println.cnt = 0;
 
     function print() {
         logArea.innerHTML += escape(Array.prototype.map.call(arguments, String).join(' '));
@@ -27,36 +32,27 @@
 <script src="objectExpression.js" charset="UTF-8"></script>
 <script>
 
-    var test = parse('3 y -').diff('x').simplify();
-
-    println("test: ", test.toString());
-
-    var expr2 = new Subtract(
-            new Multiply(
-                    new Const(0),
-                    new Variable("x")
-            ),
-            new Variable("x")
-    );
-
-    var expr = new Subtract(
-        new Multiply(
-            new Const(2),
-            new Variable("x")
-        ),
-        new Const(3)
-    );
+    var expr = new Divide(new Negate(new Variable('x')), new Const(2));
 
     println("run");
-
     println(expr.toString());
-    println(expr.evaluate(1, 2, 3));
+    println(expr.prefix());
 
-    println(expr2.toString());
-    //println(expr2.simplify().toString());
-    println(expr2.toString() + "  =  " + expr2.evaluate(1, 2, 3));
-    println(expr2.diff('x').toString());
-    //println(expr2.diff('x').simplify().toString());
+    println("--------------------------");
+
+    println(parsePrefix('(- (* 2 x) 3)').toString());
+    println("--------------------------");
+    try {
+        println(parsePrefix('1*0').toString());
+    } catch (e) {
+        println(e);
+    }
+    println("--------------------------");
+    try {
+        println(parsePrefix('fafa').toString());
+    } catch (e) {
+        println(e);
+    }
 </script>
 </body>
 </html>

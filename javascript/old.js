@@ -46,12 +46,6 @@ function sinDiff(expr, varName) {
 function cosDiff(expr, varName) {
     return new Multiply(new Negate(new Sin(expr[0])), expr[0].diff(varName));
 }
-function expDiff(expr, varName) {
-    return new Multiply(new Exp(expr[0]), expr[0].diff(varName));
-}
-function ArcTanDiff(expr, varName) {
-    return new Divide(expr[0].diff(varName), new Add(new Const(1), new Multiply(expr[0], expr[0])));
-}
 
 function Const(constValue) {
     this.value = constValue;
@@ -65,7 +59,6 @@ Const.prototype.toString = function () {
 Const.prototype.diff = function () {
     return new Const(0);
 };
-Const.prototype.prefix = Const.prototype.toString;
 
 function Variable(varName) {
     this.name = varName;
@@ -84,7 +77,6 @@ Variable.prototype.diff = function (varName) {
         return new Const(0);
     }
 };
-Variable.prototype.prefix = Variable.prototype.toString;
 
 function Operation(operation, name, diffFunc, args) {
     var expressions = Array.prototype.slice.call(args, 0);
@@ -105,12 +97,6 @@ function Operation(operation, name, diffFunc, args) {
     this.diff = function (varName) {
         return diffFunc(expressions, varName);
     };
-
-    this.prefix = function () {
-        return '(' + name + expressions.reduce(function (ans, expr) {
-                return ans + ' ' + expr.prefix();
-            }, "") + ')';
-    };
 }
 
 function createOperation(func, funcName, diffFunc) {
@@ -128,8 +114,6 @@ var Divide = createOperation(divide, '/', divDiff);
 var Sin = createOperation(Math.sin, 'sin', sinDiff);
 var Cos = createOperation(Math.cos, 'cos', cosDiff);
 var Negate = createOperation(negate, 'negate', negDiff);
-var Exp = createOperation(Math.exp, 'exp', expDiff);
-var ArcTan = createOperation(Math.atan, 'atan', ArcTanDiff);
 
 var operations = {
     "+": Add,
@@ -138,9 +122,7 @@ var operations = {
     "/": Divide,
     "negate": Negate,
     "sin": Sin,
-    "cos": Cos,
-    "exp": Exp,
-    "atan": ArcTan
+    "cos": Cos
 };
 
 function parse(text) {
@@ -158,82 +140,4 @@ function parse(text) {
         }
     });
     return stack[0];
-}
-
-function ParsePrefixError(message, position) {
-    this.name = "ParsePrefixError";
-    this.message = message + " at " + position;
-}
-ParsePrefixError.prototype = Error.prototype;
-
-function UnexpectedTokenError(token, position) {
-    var message = "Unexpected Token '" + token.slice(0, 10) + (token.length > 10 ? "...<" + token.length + " characters>" : "") + "'";
-    ParsePrefixError.call(this, message, position);
-}
-UnexpectedTokenError.prototype = ParsePrefixError.prototype;
-
-function parsePrefix(text) {
-    var tokens = text.split('').reduce(function (arr, symbol) {
-        if (symbol === ')' || symbol === '(') {
-            arr.push(symbol);
-            arr.push('');
-        } else if (symbol === ' ') {
-            arr.push('');
-        } else {
-            arr[arr.length - 1] += symbol;
-        }
-        return arr;
-    }, ['']).filter(function (token) {
-        return token !== '';
-    });
-    var pos = 0;
-
-    function isNumber(number) {
-        var begin = 0;
-        if (number[0] === '-') {
-            begin = 1;
-        }
-        return number.slice(begin).split('').every(function (digit) {
-            return digit >= '0' && digit <= '9';
-        });
-    }
-
-    var expr = function parse(expectBracket) {
-        var ans;
-        if (pos >= tokens.length) {
-            throw new ParsePrefixError("Unexpected end of input", pos);
-        } else if (tokens[pos] === '(') {
-            pos++;
-            ans = parse(true);
-        } else if (tokens[pos] in Variable.variables) {
-            ans = new Variable(tokens[pos++]);
-        } else if (tokens[pos] in operations) {
-            var operation = operations[tokens[pos++]];
-            var args = [];
-            for (var i = 0; i < operation.size; i++) {
-                args.push(parse(false));
-            }
-            var expr = Object.create(operation.prototype);
-            operation.apply(expr, args);
-            ans = expr;
-        } else if (isNumber(tokens[pos])) {
-            ans = new Const(parseInt(tokens[pos++]));
-        } else {
-            throw new UnexpectedTokenError(tokens[pos], pos);
-        }
-        if (expectBracket) {
-            if (tokens[pos] === ')') {
-                pos++;
-            } else {
-                throw new ParsePrefixError("Expected ')'", pos);
-            }
-        }
-        return ans;
-    }(0, false);
-
-    if (pos < tokens.length) {
-        throw new UnexpectedTokenError(tokens[pos], pos);
-    } else {
-        return expr;
-    }
 }
