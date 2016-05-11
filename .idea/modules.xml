@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/ClojTest/ClojTest.iml" filepath="$PROJECT_DIR$/ClojTest/ClojTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/HomeWork.iml" filepath="$PROJECT_DIR$/HomeWork.iml" />
       <module fileurl="file://$PROJECT_DIR$/JavascriptTest/JavascriptTest.iml" filepath="$PROJECT_DIR$/JavascriptTest/JavascriptTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cloj/cloj.iml" filepath="$PROJECT_DIR$/cloj/cloj.iml" />
       <module fileurl="file://$PROJECT_DIR$/expression/expression.iml" filepath="$PROJECT_DIR$/expression/expression.iml" />
       <module fileurl="file://$PROJECT_DIR$/generics/generics.iml" filepath="$PROJECT_DIR$/generics/generics.iml" />
       <module fileurl="file://$PROJECT_DIR$/hash/hash.iml" filepath="$PROJECT_DIR$/hash/hash.iml" />
